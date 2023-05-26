@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Coustomer;
 use App\Models\otp;
+use App\Models\Theme;
+
+use Illuminate\Support\Facades\File;
 
 class AccountController extends Controller
 {
@@ -71,7 +74,7 @@ class AccountController extends Controller
         $customer = Coustomer::where('phone', $req->phone)->first(); // Customer database 
         $otpDB = new otp(); // otp database
         $t = time();
-        $otp = rand(1000, 9999);
+        $otp = rand(123456, 999999);
         $isd = '+91';
         $phone = $isd . $customer->phone;
         $otpDB->otp = $otp;
@@ -118,6 +121,78 @@ class AccountController extends Controller
             }
         } else {
             return response()->json(['statuse' => 'Fail', 'message' => 'Invalid OTP']);
+        }
+    }
+
+
+
+
+
+
+    // Show all theme function
+    public function showAllThemes()
+    {
+        $output = Theme::all();
+        $alldata = array('error_code' => '201', 'success' => 'true', 'data' => $output);
+        return response()->json($alldata);
+    }
+
+    // Show one Theme
+    public function showOneTheme($id)
+    {
+        //return response()->json(Theme::find($id));
+        $output = Theme::find($id);
+        $alldata = array('error_code' => '202', 'success' => 'true', 'data' => array($output));
+        return response()->json($alldata);
+    }
+
+
+    public function upload(Request $req)
+    {
+        $theme = $req->file('icon')->store('icon');
+        $them = new Theme();
+        $them->title = $req->title;
+        $them->icon = $theme;
+        $them->save();
+        $data = [
+            'title' => $req->title,
+            'icon' => $theme
+        ];
+        $res = response()->json(['error_code' => '201', 'success' => 'true', 'data' => $data], 200);
+        return $res;
+    }
+
+    // Update Theme
+    public function update(Request $req, $id)
+    {
+        $theme = Theme::findOrfail($id);
+        $themeicon = $theme->icon;
+        // $themeicon = str_replace("//", "/\/",$themeicon);
+        // $themeicon = str_replace("\\", "/",$themeicon);
+        $themeicon = str_replace('/', '\\', $themeicon);
+        $destination = public_path("storage\\" . $themeicon);
+        $destination = str_replace("/", "\\", $destination);
+        if(File::exists($destination)){
+            File::delete($destination);
+            $req->file('new_icon')->store('icon','abc');
+            return 'file is deleted from database';
+        }else{
+            return 'file is not deleted from database';
+        }
+        
+    }
+
+    // Delete Theme
+    public function delete($id)
+    {
+        $ids = Theme::where('id', $id)->first();
+        if ($ids) {
+            Theme::findOrFail($id)->delete();
+            $alldata = array('data' => "Deleted Successfully", 'error_code' => '205', 'success' => 'true');
+            return response()->json($alldata);
+        } else {
+            $res = array('data' => "Not Deleted", 'error_code' => '422', 'success' => 'false');
+            return response()->json($res, 422);
         }
     }
 

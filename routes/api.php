@@ -35,3 +35,14 @@ Route::get('otp',[AccountController::class,'generateOTP']);
 Route::post('sendOTP',[AccountController::class,'sendOTP']);
 Route::post('verifyOtp',[AccountController::class,'verifyOtp']);
 
+
+
+// Theme API => Application Programming Interface
+Route::post('theme',[AccountController::class,'upload']);
+Route::get('theme',[AccountController::class,'showAllThemes']);
+Route::get('showOneTheme/{id}',[AccountController::class,'showOneTheme']);
+Route::delete('deleteTheme/{id}',[AccountController::class,'delete']);
+Route::put('updateTheme/{id}',[AccountController::class,'update']);
+
+
+
