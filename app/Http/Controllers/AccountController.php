@@ -9,6 +9,7 @@ use App\Models\otp;
 use App\Models\Theme;
 
 use Illuminate\Support\Facades\File;
+use Validator;
 
 class AccountController extends Controller
 {
@@ -163,24 +164,49 @@ class AccountController extends Controller
     }
 
     // Update Theme
-    public function update(Request $req, $id)
-    {
-        $theme = Theme::findOrfail($id);
-        $themeicon = $theme->icon;
-        // $themeicon = str_replace("//", "/\/",$themeicon);
-        // $themeicon = str_replace("\\", "/",$themeicon);
-        $themeicon = str_replace('/', '\\', $themeicon);
-        $destination = public_path("storage\\" . $themeicon);
-        $destination = str_replace("/", "\\", $destination);
-        if(File::exists($destination)){
-            File::delete($destination);
-            $req->file('new_icon')->store('icon','abc');
-            return 'file is deleted from database';
-        }else{
-            return 'file is not deleted from database';
-        }
-        
-    }
+    // public function update(Request $req, $id)
+    // {
+    //     $theme = Theme::findOrfail($id);
+    //     // $checkTheme = Theme::where('id', $id)->first();
+    //     $themeicon = $theme->icon;
+    //     // $themeicon = str_replace("//", "/\/",$themeicon);
+    //     // $themeicon = str_replace("\\", "/",$themeicon);
+    //     $themeicon = str_replace('/', '\\', $themeicon);
+    //     $destination = public_path("storage\\".$themeicon);
+    //     $destination = str_replace("/", "\\", $destination);
+    //     $destination = str_replace('\\','/', $destination);
+    //     if(File::exists($destination)){
+    //         $deletedFile = File::delete($destination);
+    //         // $req->file('new_icon')->store('icon','abc');
+    //         if($deletedFile){
+    //             $store = $req->file('new_icon')->store('icon','new_icon');
+    //             $res = response()->json(['data' => $store , 'error_code' => '201', 'success' => 'true' ,'message' => 'updated new record']);
+    //             return $res;     
+    //         }
+
+    //     }else{
+    //         return 'file is not deleted from database';
+    //     }
+
+    //     // return $destination;
+
+
+
+
+
+
+
+
+    //     // if(!$checkTheme){
+    //     //     $res = response()->json(['error_code' => '404', 'success' => 'fail', 'message' => 'Inavalid Id']);
+    //     //     return $res;
+    //     // }else{
+    //     //     return $theme;
+    //     // }
+
+
+
+    // }
 
     // Delete Theme
     public function delete($id)
@@ -195,5 +221,54 @@ class AccountController extends Controller
             return response()->json($res, 422);
         }
     }
+
+
+
+    public function update(Request $request, $id)
+    {
+        $theme = Theme::find($id);
+        if (!$theme) {
+            return response()->json(['message' => 'Id not found', 'request' => $request->all()], 404);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required',
+                'icon' => 'required'
+            ]);
+            if ($validator->fails()) {
+                $res = response()->json(['success' => false, 'message' => $validator->errors()], 400);
+                return $res;
+            } else {
+                $themeicon = $theme->icon;
+                $themeicon = str_replace('/', '\\', $themeicon);
+                $destination = public_path("storage\\" . $themeicon);
+                $destination = str_replace("/", "\\", $destination);
+                $destination = str_replace('\\', '/', $destination);
+                if (File::exists($destination)) {
+                    $deletedFile = File::delete($destination);
+                    // $req->file('new_icon')->store('icon','abc');
+                    if ($deletedFile) {
+                        $store = $request->file('icon')->store('../../../storage/app/icon');
+                        $res = response()->json(['data' => $store, 'error_code' => '201', 'success' => 'true', 'message' => 'updated new record']);
+                        return $res;
+                    }
+
+                } else {
+                    $res = response()->json([ 'error_code' => '400', 'success' => 'true', 'message' => 'something went wrong record is not updated']);
+                    return $res;
+                }
+                return $destination;
+            }
+        }
+    }
+
+
+    public function abc(Request $req){
+        return $req;
+        // return response()->json(['ssdj'=>'adarsh']);
+    }
+
+
+
+    
 
 }

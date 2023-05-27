@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\PackageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +43,16 @@ Route::post('theme',[AccountController::class,'upload']);
 Route::get('theme',[AccountController::class,'showAllThemes']);
 Route::get('showOneTheme/{id}',[AccountController::class,'showOneTheme']);
 Route::delete('deleteTheme/{id}',[AccountController::class,'delete']);
-Route::put('updateTheme/{id}',[AccountController::class,'update']);
+Route::post('updateTheme/{id}',[AccountController::class,'update']);
+
+
+// jjfks
+Route::post('abc',[AccountController::class,'abc']);
+
+
+
+// Package Controller Routing
+Route::get('/aaua',[PackageController::class,'abc']);
 
 
 
