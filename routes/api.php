@@ -51,8 +51,20 @@ Route::post('abc',[AccountController::class,'abc']);
 
 
 
-// Package Controller Routing
-Route::get('/aaua',[PackageController::class,'abc']);
+/*
+|--------------------------------------------------------------------------
+|       Package Controller Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
+*/
 
+Route::get('/get-all-package',[PackageController::class,'allPackage']);
+Route::post('/post-package',[PackageController::class,'postPackage']);
+Route::put('/update-package/{id}',[PackageController::class,'updatePackage']);
+Route::delete('delete-package/{id}',[PackageController::class,'deletePackage']);
 
 
